@@ -27,15 +27,18 @@ module Authority
     def authorizer
       self.class.authorizer.new(self) # instantiate on every check, in case model has changed
     end
-
+    
     module Definitions
       # Send all calls like `editable_by?` to an authorizer instance
       # Not using Forwardable because it makes it harder for users to track an ArgumentError
       # back to their authorizer
       Authority.adjectives.each do |adjective|
-        define_method("#{adjective}_by?") { |*args| authorizer.send("#{adjective}_by?", *args) }
+        define_method("#{adjective}_by?") do |*args|
+          authorizer_class = args.first.try(:admin?) ? AdminAuthorizer : authorizer
+          authorizer_class.send("#{adjective}_by?", *args) }
       end
     end
+    
     include Definitions
 
     module ClassMethods
@@ -54,8 +57,6 @@ module Authority
                   "#{authorizer_name} is set as the authorizer for #{self}, but the constant is missing"
               )
       end
-
     end
-
   end
 end
