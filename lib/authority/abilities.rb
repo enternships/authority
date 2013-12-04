@@ -34,8 +34,8 @@ module Authority
       # back to their authorizer
       Authority.adjectives.each do |adjective|
         define_method("#{adjective}_by?") do |*args|
-          authorizer_class = args.first.try(:admin?) ? AdminAuthorizer : authorizer
-          authorizer_class.send("#{adjective}_by?", *args) }
+          authorizer_class.send("#{adjective}_by?", *args)
+        end
       end
     end
     
