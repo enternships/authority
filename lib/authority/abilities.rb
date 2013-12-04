@@ -34,6 +34,12 @@ module Authority
       # back to their authorizer
       Authority.adjectives.each do |adjective|
         define_method("#{adjective}_by?") do |*args|
+          authorizer_class = authorizer
+          
+          if ApplicationAuthorizer.respond_to?(:determine_authorizer)
+            authorizer_class = ApplicationAuthorizer.determine_authorizer(authorizer_class, args)
+          end
+            
           authorizer_class.send("#{adjective}_by?", *args)
         end
       end
